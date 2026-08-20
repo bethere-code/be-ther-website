@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ink-950 text-cream-200 font-sans antialiased;
+  }
+  ::selection {
+    @apply bg-coral-500/30 text-white;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950;
+  }
+  .btn-primary {
+    @apply btn bg-coral-500 text-white shadow-glow hover:bg-coral-400 hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-accent {
+    @apply btn bg-amber-500 text-ink-950 font-bold shadow-float hover:bg-amber-400 hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-ghost {
+    @apply btn border border-white/15 bg-white/5 text-white backdrop-blur hover:bg-white/10 hover:border-white/25;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-coral-500/30 bg-coral-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-coral-300;
+  }
+
+  /* Dark glass card (on dark bg) */
+  .card-dark {
+    @apply rounded-3xl border border-white/10 bg-ink-800/60 backdrop-blur-xl;
+  }
+
+  /* Cream card (matches the app's in-app form surface) */
+  .card-cream {
+    @apply rounded-3xl border border-cream-300/30 bg-cream-100;
+  }
+}
+
+/* Reveal-on-scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
