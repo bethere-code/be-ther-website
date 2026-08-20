@@ -14,6 +14,9 @@
   ::selection {
     @apply bg-coral-500/30 text-white;
   }
+  .admin-shell ::selection {
+    @apply bg-ink-200 text-ink-950;
+  }
 }
 
 @layer components {
