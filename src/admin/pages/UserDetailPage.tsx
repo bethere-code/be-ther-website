@@ -7,11 +7,28 @@ import { ActivityTable } from '../activityTables';
 import { Pager } from '../Pager';
 import { Empty, ErrorBox, Panel, StatCard } from '../ui';
 
-function deviceLine(d?: Record<string, string>) {
+function deviceLine(d?: Record<string, unknown>) {
   if (!d || (!d.model && !d.platform)) return 'Not recorded';
   return [d.model, d.platform, d.os, d.appVersion && `v${d.appVersion}`, d.deviceId]
     .filter(Boolean)
     .join(' · ');
+}
+
+function locationLine(d?: Record<string, unknown>): string | null {
+  const loc = d?.location;
+  if (!loc || typeof loc !== 'object') return null;
+  const { lat, lng, accuracyM } = loc as {
+    lat?: unknown;
+    lng?: unknown;
+    accuracyM?: unknown;
+  };
+  if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  const acc =
+    typeof accuracyM === 'number' && Number.isFinite(accuracyM)
+      ? ` ±${Math.round(accuracyM)}m`
+      : '';
+  return `${lat.toFixed(5)}, ${lng.toFixed(5)}${acc}`;
 }
 
 function permLabel(entry?: { granted?: boolean } | null): 'On' | 'Off' {
@@ -51,9 +68,12 @@ export function UserDetailPage({ id }: { id: string }) {
 
   const u = data?.user;
   const posts = postsData?.items ?? [];
-  const first = u?.firstDevice as Record<string, string> | undefined;
-  const last = u?.lastDevice as Record<string, string> | undefined;
-  const lastActiveAt = (u?.lastActiveAt as string | undefined) || last?.at;
+  const first = u?.firstDevice as Record<string, unknown> | undefined;
+  const last = u?.lastDevice as Record<string, unknown> | undefined;
+  const lastActiveAt =
+    (u?.lastActiveAt as string | undefined) || (last?.at as string | undefined);
+  const firstLoc = locationLine(first);
+  const lastLoc = locationLine(last);
   const settings = u?.settings as Record<string, unknown> | undefined;
   const devicePerms = u?.devicePermissions as
     | {
@@ -121,12 +141,20 @@ export function UserDetailPage({ id }: { id: string }) {
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-coral-600">Signup device</p>
                   <p className="mt-1.5 text-ink-900">{deviceLine(first)}</p>
-                  <p className="mt-1 text-xs text-ink-500">{fmtDate(first?.at)} IST</p>
+                  {firstLoc ? (
+                    <p className="mt-1 text-xs text-ink-600">Location · {firstLoc}</p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-ink-500">{fmtDate(first?.at as string | undefined)} IST</p>
                 </div>
                 <div className="border-t border-ink-950/8 pt-4">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Last login</p>
                   <p className="mt-1.5 text-ink-900">{deviceLine(last)}</p>
-                  <p className="mt-1 text-xs text-ink-500">{fmtDate(last?.at || lastActiveAt)} IST</p>
+                  {lastLoc ? (
+                    <p className="mt-1 text-xs text-ink-600">Location · {lastLoc}</p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-ink-500">
+                    {fmtDate((last?.at as string | undefined) || lastActiveAt)} IST
+                  </p>
                 </div>
               </div>
             </Panel>

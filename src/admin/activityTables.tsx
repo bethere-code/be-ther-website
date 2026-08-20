@@ -28,6 +28,7 @@ type DeviceInfo = {
   appVersion?: string;
   appBuild?: string;
   deviceId?: string;
+  location?: { lat?: number; lng?: number; accuracyM?: number };
 };
 
 function deviceOf(ev: Record<string, unknown>): DeviceInfo | null {
@@ -42,15 +43,29 @@ function deviceShort(d: DeviceInfo | null): string {
   return bits.length ? bits.join(' · ') : '—';
 }
 
+function formatDeviceLocation(d: DeviceInfo | null): string | null {
+  const loc = d?.location;
+  if (typeof loc?.lat !== 'number' || typeof loc?.lng !== 'number') return null;
+  if (!Number.isFinite(loc.lat) || !Number.isFinite(loc.lng)) return null;
+  const acc =
+    typeof loc.accuracyM === 'number' && Number.isFinite(loc.accuracyM)
+      ? ` ±${Math.round(loc.accuracyM)}m`
+      : '';
+  return `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}${acc}`;
+}
+
 function deviceDetailLines(d: DeviceInfo | null): Array<[string, string]> {
   if (!d) return [['Device', 'Not recorded']];
-  return [
+  const lines: Array<[string, string]> = [
     ['Phone', d.model || '—'],
     ['Platform', d.platform || '—'],
     ['OS', d.os || '—'],
     ['App', d.appVersion ? `v${d.appVersion}${d.appBuild ? ` (${d.appBuild})` : ''}` : '—'],
     ['Device id', d.deviceId || '—'],
   ];
+  const loc = formatDeviceLocation(d);
+  if (loc) lines.push(['Location', loc]);
+  return lines;
 }
 
 export function ActivityTable({
