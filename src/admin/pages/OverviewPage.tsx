@@ -1,4 +1,4 @@
-import { Activity, Flag, Heart, Image, LogIn, MessageCircle, UserPlus, Users as UsersIcon } from 'lucide-react';
+import { Activity, Flag, Heart, Image, LogIn, MessageCircle, UserPlus } from 'lucide-react';
 import { dayEndIso, dayStartIso, fmtMs, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
@@ -51,7 +51,7 @@ export function OverviewPage() {
       {data ? (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="New users" value={data.usersInRange} tone="coral" icon={UsersIcon} />
+            <StatCard label="Signups" value={data.usersInRange} tone="coral" icon={UserPlus} />
             <StatCard label="New posts" value={data.postsInRange} tone="ink" icon={Image} />
             <StatCard
               label="Screen time"
@@ -63,7 +63,6 @@ export function OverviewPage() {
             <StatCard label="Logins" value={data.auth.login ?? 0} tone="ink" icon={LogIn} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Signups" value={data.auth.signup ?? 0} tone="coral" icon={UserPlus} />
             <StatCard label="Likes" value={data.likesInRange} tone="amber" icon={Heart} />
             {/* <StatCard label="Follows" value={data.followsInRange} tone="success" icon={UserCheck} /> */}
             <StatCard label="Comments" value={data.commentsInRange} tone="cream" icon={MessageCircle} />
