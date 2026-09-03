@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { adminFetch } from '../api';
+import { CityTopicSelect } from '../CityTopicSelect';
+import { OpenInApp, type OpenScreen } from '../OpenInApp';
+import { UsernamePills, type PickedUser } from '../UsernamePills';
+import type { PickedEvent } from '../EventPills';
 import { field, fieldLabel, Panel } from '../ui';
+import { useAdminQuery } from '../useAdminQuery';
 
 type Audience = 'all' | 'city' | 'usernames';
 
@@ -24,17 +29,49 @@ export function PushPage() {
   const [title, setTitle] = useState('BE THER');
   const [body, setBody] = useState('');
   const [city, setCity] = useState('');
-  const [usernames, setUsernames] = useState('');
+  const [picked, setPicked] = useState<PickedUser[]>([]);
+  const [openScreen, setOpenScreen] = useState<OpenScreen>('');
+  const [openProfile, setOpenProfile] = useState<PickedUser | null>(null);
+  const [openEvent, setOpenEvent] = useState<PickedEvent | null>(null);
   const [silent, setSilent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PushResult | null>(null);
+  const topicsUrl = audience === 'city' ? '/api/v1/admin/push/city-topics' : null;
+  const { data: topicData, error: topicError } = useAdminQuery<{
+    items: { topic: string; label: string; subscribers: number }[];
+  }>(topicsUrl);
+  const cityTopics = topicData?.items ?? [];
+  const topicsReady = audience !== 'city' || topicData != null || Boolean(topicError);
+
+  useEffect(() => {
+    if (audience !== 'city' || !topicData) return;
+    const items = topicData.items;
+    if (items.some((t) => t.topic === city)) return;
+    setCity(items[0]?.topic ?? '');
+  }, [audience, topicData, city]);
 
   async function send() {
     setError(null);
     setResult(null);
     if (!title.trim() || !body.trim()) {
       setError('Title and body are required');
+      return;
+    }
+    if (audience === 'city' && !city) {
+      setError('Pick a city topic');
+      return;
+    }
+    if (audience === 'usernames' && picked.length === 0) {
+      setError('Pick at least one username');
+      return;
+    }
+    if (!silent && openScreen === 'profile' && !openProfile) {
+      setError('Pick a profile to open');
+      return;
+    }
+    if (!silent && openScreen === 'event' && !openEvent) {
+      setError('Pick an event to open');
       return;
     }
     setBusy(true);
@@ -45,12 +82,14 @@ export function PushPage() {
         audience,
         silent,
       };
-      if (audience === 'city') payload.city = city.trim();
+      if (audience === 'city') payload.topic = city;
       if (audience === 'usernames') {
-        payload.usernames = usernames
-          .split(/[\s,]+/)
-          .map((u) => u.replace(/^@/, '').trim().toLowerCase())
-          .filter(Boolean);
+        payload.usernames = picked.map((u) => u.username);
+      }
+      if (!silent && openScreen) {
+        payload.screen = openScreen;
+        if (openScreen === 'profile' && openProfile) payload.id = openProfile.username;
+        if (openScreen === 'event' && openEvent) payload.id = openEvent.id;
       }
       const data = await adminFetch<PushResult>('/api/v1/admin/push', {
         method: 'POST',
@@ -90,31 +129,17 @@ export function PushPage() {
           </label>
 
           {audience === 'city' && (
-            <label className={fieldLabel}>
-              City
-              <input
-                className={`mt-1 block w-full max-w-md ${field}`}
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Hyderabad"
-              />
-              <span className="mt-1 block text-xs text-ink-400">
-                Sends to topic city_hyderabad — only users currently subscribed via location.
-              </span>
-            </label>
+            <CityTopicSelect
+              items={cityTopics}
+              value={city}
+              onChange={setCity}
+              loading={!topicData && !topicError}
+              error={topicError}
+            />
           )}
 
           {audience === 'usernames' && (
-            <label className={fieldLabel}>
-              Usernames
-              <textarea
-                className={`mt-1 block w-full max-w-lg ${field}`}
-                rows={4}
-                value={usernames}
-                onChange={(e) => setUsernames(e.target.value)}
-                placeholder="alice bob @carol"
-              />
-            </label>
+            <UsernamePills value={picked} onChange={setPicked} />
           )}
 
           <label className={fieldLabel}>
@@ -148,6 +173,17 @@ export function PushPage() {
             Silent (data-only — refreshes badge, no banner)
           </label>
 
+          {!silent ? (
+            <OpenInApp
+              screen={openScreen}
+              onScreen={setOpenScreen}
+              profile={openProfile}
+              onProfile={setOpenProfile}
+              event={openEvent}
+              onEvent={setOpenEvent}
+            />
+          ) : null}
+
           {error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
           )}
@@ -167,7 +203,7 @@ export function PushPage() {
 
           <button
             type="button"
-            disabled={busy}
+            disabled={busy || (audience === 'city' && (!topicsReady || cityTopics.length === 0))}
             onClick={() => void send()}
             className="rounded-xl bg-coral-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-coral-600 disabled:opacity-60"
           >
@@ -182,6 +218,7 @@ export function PushPage() {
             <li>Announce to all subscribed devices (broadcast)</li>
             <li>Blast people currently in a city (city topic)</li>
             <li>Target a hand-picked username list (device tokens)</li>
+            <li>Optional tap target: Alerts, settings, a profile, or an event</li>
             <li>Silent sync so the app refreshes unread without a banner</li>
           </ul>
           <p className="pt-2 text-xs text-ink-400">
