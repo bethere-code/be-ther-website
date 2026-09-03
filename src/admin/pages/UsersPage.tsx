@@ -110,7 +110,7 @@ export function UsersPage() {
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-ink-950/8">
-                  <th className={th}>User</th>
+                  <th className={`${th} !text-left`}>User</th>
                   <th className={`${th}`}>Events</th>
                   <th className={`${th}`}>Followers</th>
                   <th className={`${th}`}>Following</th>
@@ -135,8 +135,8 @@ export function UsersPage() {
                         if (e.key === 'Enter') go(`/admin/users/${idOf(u)}`);
                       }}
                     >
-                      <td className={`${td} whitespace-normal`}>
-                        <div className="flex flex-col items-center">
+                      <td className={`${td} whitespace-normal !text-left`}>
+                        <div className="flex flex-col items-start">
                           <p className="font-semibold leading-snug text-ink-950">
                             {String(u.displayName || u.username || '—')}
                           </p>
