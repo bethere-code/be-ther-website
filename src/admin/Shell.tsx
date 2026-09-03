@@ -1,5 +1,6 @@
 import {
   Activity,
+  Bell,
   Flag,
   Image,
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   OverviewPage,
   PostDetailPage,
   PostsPage,
+  PushPage,
   ReportsPage,
   UserDetailPage,
   UsersPage,
@@ -26,6 +28,7 @@ const nav = [
   { to: '/admin/users', label: 'Users', icon: UsersIcon },
   { to: '/admin/posts', label: 'Posts', icon: Image },
   { to: '/admin/analytics', label: 'Analytics', icon: Activity },
+  { to: '/admin/push', label: 'Push', icon: Bell },
   { to: '/admin/reports', label: 'Reports', icon: Flag },
 ];
 
@@ -113,6 +116,7 @@ export function Shell({ path }: { path: string }) {
             {path === '/admin/posts' ? <PostsPage /> : null}
             {page === 'post' ? <PostDetailPage id={path.split('/').pop() ?? ''} /> : null}
             {path === '/admin/analytics' ? <AnalyticsPage /> : null}
+            {path === '/admin/push' ? <PushPage /> : null}
             {path === '/admin/reports' ? <ReportsPage /> : null}
           </main>
         </div>
