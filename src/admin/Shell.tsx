@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Sparkles,
   Users as UsersIcon,
   X,
 } from 'lucide-react';
@@ -14,6 +15,7 @@ import { go, Link } from '../hooks/usePathRoute';
 import { adminEmail, clearSession } from './api';
 import {
   AnalyticsPage,
+  NudgesPage,
   OverviewPage,
   PostDetailPage,
   PostsPage,
@@ -29,6 +31,7 @@ const nav = [
   { to: '/admin/posts', label: 'Posts', icon: Image },
   { to: '/admin/analytics', label: 'Analytics', icon: Activity },
   { to: '/admin/push', label: 'Push', icon: Bell },
+  { to: '/admin/nudges', label: 'Nudges', icon: Sparkles },
   { to: '/admin/reports', label: 'Reports', icon: Flag },
 ];
 
@@ -117,6 +120,7 @@ export function Shell({ path }: { path: string }) {
             {page === 'post' ? <PostDetailPage id={path.split('/').pop() ?? ''} /> : null}
             {path === '/admin/analytics' ? <AnalyticsPage /> : null}
             {path === '/admin/push' ? <PushPage /> : null}
+            {path === '/admin/nudges' ? <NudgesPage /> : null}
             {path === '/admin/reports' ? <ReportsPage /> : null}
           </main>
         </div>
