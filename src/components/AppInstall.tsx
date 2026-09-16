@@ -1,5 +1,8 @@
 import { Apple, Play, Star } from 'lucide-react';
 
+const iosStoreUrl = import.meta.env.VITE_IOS_STORE_URL?.trim() || '#';
+const androidStoreUrl = import.meta.env.VITE_ANDROID_STORE_URL?.trim() || '#';
+
 export function AppInstall() {
   return (
     <section id="features" className="relative overflow-hidden py-20 sm:py-28">
@@ -34,14 +37,14 @@ export function AppInstall() {
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
             <StoreButton
               store="appstore"
-              href="#"
+              href={iosStoreUrl}
               topLine="Download on the"
               bottomLine="App Store"
               icon={<Apple className="h-7 w-7" strokeWidth={1.5} />}
             />
             <StoreButton
               store="playstore"
-              href="#"
+              href={androidStoreUrl}
               topLine="Get it on"
               bottomLine="Google Play"
               icon={<Play className="h-6 w-6" fill="currentColor" />}
@@ -78,6 +81,7 @@ function StoreButton({
   return (
     <a
       href={href}
+      {...(href !== '#' ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className={`group inline-flex items-center gap-3 rounded-2xl border px-5 py-3 transition-all duration-300 hover:-translate-y-0.5 ${
         store === 'appstore'
           ? 'border-white/15 bg-white text-ink-950 hover:bg-cream-100'
@@ -86,7 +90,11 @@ function StoreButton({
     >
       <span className="shrink-0">{icon}</span>
       <span className="flex flex-col items-start leading-tight">
-        <span className={`text-[10px] font-medium uppercase tracking-wider ${store === 'appstore' ? 'text-ink-950/60' : 'text-cream-200/60'}`}>
+        <span
+          className={`text-[10px] font-medium uppercase tracking-wider ${
+            store === 'appstore' ? 'text-ink-950/60' : 'text-cream-200/60'
+          }`}
+        >
           {topLine}
         </span>
         <span className="font-display text-lg font-bold">{bottomLine}</span>
