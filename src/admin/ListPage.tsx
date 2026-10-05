@@ -12,7 +12,6 @@ export function ListPage({
   render,
   extra,
   toolbar,
-  defaultRange,
 }: {
   title: string;
   path: string;
@@ -20,10 +19,9 @@ export function ListPage({
   render: (row: Record<string, unknown>) => React.ReactNode;
   extra?: Record<string, string | undefined>;
   toolbar?: React.ReactNode;
-  defaultRange?: boolean;
 }) {
-  const [from, setFrom] = useStickyState(`list.${path}.from`, () => (defaultRange ? daysAgoIso(7) : ''));
-  const [to, setTo] = useStickyState(`list.${path}.to`, () => (defaultRange ? todayIso() : ''));
+  const [from, setFrom] = useStickyState(`list.${path}.from`, () => daysAgoIso(7));
+  const [to, setTo] = useStickyState(`list.${path}.to`, () => todayIso());
   const [dir, setDir] = useStickyState(`list.${path}.dir`, () => 'desc');
   const [page, setPage] = useStickyState(`list.${path}.page`, () => 1);
   const url = `${path}${toQuery({

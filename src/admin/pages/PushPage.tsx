@@ -108,7 +108,7 @@ export function PushPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-ink-950">Push</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-500">
-          Send FCM to the app. Social alerts (follow, wishlist, calendar) are automatic.
+          Send FCM to the app. Social alerts (follow, like, comment, calendar) are automatic.
           Use this for announcements, city event blasts, or a custom user list.
         </p>
       </div>

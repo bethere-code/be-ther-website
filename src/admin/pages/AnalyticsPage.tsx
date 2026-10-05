@@ -6,6 +6,7 @@ import { daysAgoIso, todayIso } from '../dates';
 import { SessionActivityTable } from '../activityTables';
 import type { AnalyticsSession } from '../groupAnalyticsSessions';
 import { Pager } from '../Pager';
+import { ActiveUsersBadge } from '../ActiveUsersBadge';
 import { DateRange, ErrorBox, field, fieldLabel, fmtRangeLabel, Panel } from '../ui';
 
 type SessionsResponse = {
@@ -37,13 +38,18 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-ink-950">Analytics</h1>
-        <p className="mt-1 text-sm text-ink-500">
-          {fmtRangeLabel(from, to)}
-          <span className="mx-2 text-ink-300">·</span>
-          Grouped by user session on the server · tap a row to open the user
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-ink-950">Analytics</h1>
+          <p className="mt-1 text-sm text-ink-500">
+            {fmtRangeLabel(from, to)}
+            <span className="mx-2 text-ink-300">·</span>
+            Grouped by user session on the server
+            <span className="mx-2 text-ink-300">·</span>
+            tap a row to open the user
+          </p>
+        </div>
+        <ActiveUsersBadge />
       </div>
 
       <div className="flex flex-wrap items-end gap-x-3 gap-y-2.5 rounded-2xl border border-ink-950/8 bg-white p-3.5 shadow-soft">
