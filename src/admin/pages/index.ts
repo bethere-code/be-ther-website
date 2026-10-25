@@ -1,4 +1,5 @@
 export { AnalyticsPage } from './AnalyticsPage';
+export { LocationsPage } from './LocationsPage';
 export { OverviewPage } from './OverviewPage';
 export { NudgesPage } from './NudgesPage';
 export { PostDetailPage } from './PostDetailPage';

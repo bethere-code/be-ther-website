@@ -5,6 +5,7 @@ import {
   Image,
   LayoutDashboard,
   LogOut,
+  MapPin,
   Menu,
   Sparkles,
   Users as UsersIcon,
@@ -15,6 +16,7 @@ import { go, Link } from '../hooks/usePathRoute';
 import { adminEmail, clearSession } from './api';
 import {
   AnalyticsPage,
+  LocationsPage,
   NudgesPage,
   OverviewPage,
   PostDetailPage,
@@ -28,6 +30,7 @@ import {
 const nav = [
   { to: '/admin/overview', label: 'Overview', icon: LayoutDashboard },
   { to: '/admin/users', label: 'Users', icon: UsersIcon },
+  { to: '/admin/locations', label: 'Locations', icon: MapPin },
   { to: '/admin/posts', label: 'Posts', icon: Image },
   { to: '/admin/analytics', label: 'Analytics', icon: Activity },
   { to: '/admin/push', label: 'Push', icon: Bell },
@@ -115,6 +118,7 @@ export function Shell({ path }: { path: string }) {
           <main id="admin-main" className="p-4 md:p-6">
             {page === 'overview' || path === '/admin' ? <OverviewPage /> : null}
             {path === '/admin/users' ? <UsersPage /> : null}
+            {path === '/admin/locations' ? <LocationsPage /> : null}
             {page === 'user' ? <UserDetailPage id={path.split('/').pop() ?? ''} /> : null}
             {path === '/admin/posts' ? <PostsPage /> : null}
             {page === 'post' ? <PostDetailPage id={path.split('/').pop() ?? ''} /> : null}

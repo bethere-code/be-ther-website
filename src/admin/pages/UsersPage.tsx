@@ -115,6 +115,7 @@ export function UsersPage() {
                   <th className={`${th}`}>Followers</th>
                   <th className={`${th}`}>Following</th>
                   <th className={th}>Last active</th>
+                  <th className={th}>First city</th>
                   <th className={th}>Joined</th>
                 </tr>
               </thead>
@@ -155,6 +156,9 @@ export function UsersPage() {
                         ) : (
                           <span className="text-ink-400">—</span>
                         )}
+                      </td>
+                      <td className={td}>
+                        {u.firstCity ? String(u.firstCity) : <span className="text-ink-400">—</span>}
                       </td>
                       <td className={td}>{fmtDate(u.createdAt as string)}</td>
                     </tr>

@@ -125,6 +125,8 @@ export function UserDetailPage({ id }: { id: string }) {
                 <dd className="whitespace-pre-wrap text-ink-800">{String(u.bio || '—')}</dd>
                 <dt className="text-ink-500">Joined</dt>
                 <dd>{fmtDate(u.createdAt as string)} IST</dd>
+                <dt className="text-ink-500">First city</dt>
+                <dd>{String(u.firstCity || '—')}</dd>
                 <dt className="text-ink-500">FCM</dt>
                 <dd className="break-all text-xs text-ink-600">{String(u.fcmToken || '—')}</dd>
                 <dt className="text-ink-500">Auth</dt>
