@@ -2,7 +2,7 @@ import { Activity, Flag, Heart, Image, LogIn, MessageCircle, UserPlus } from 'lu
 import { dayEndIso, dayStartIso, fmtMs, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
-import { daysAgoIso, todayIso } from '../dates';
+import { todayIso } from '../dates';
 import { DateRange, ErrorBox, fmtRangeLabel, Panel, StatCard } from '../ui';
 
 const laterIdeas = [
@@ -29,7 +29,7 @@ export type Overview = {
 };
 
 export function OverviewPage() {
-  const [from, setFrom] = useStickyState('overview.from', () => daysAgoIso(7));
+  const [from, setFrom] = useStickyState('overview.from', () => todayIso());
   const [to, setTo] = useStickyState('overview.to', () => todayIso());
   const url = `/api/v1/admin/overview${toQuery({ from: dayStartIso(from), to: dayEndIso(to) })}`;
   const { data, error, reload } = useAdminQuery<Overview>(url);

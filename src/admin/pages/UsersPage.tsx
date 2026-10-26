@@ -2,12 +2,12 @@ import { go } from '../../hooks/usePathRoute';
 import { dayEndIso, dayStartIso, fmtDate, idOf, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
-import { daysAgoIso, todayIso } from '../dates';
+import { todayIso } from '../dates';
 import { Pager } from '../Pager';
 import { DateRange, Empty, ErrorBox, field, fieldLabel, fmtRangeLabel, Panel, TableWrap, td, th } from '../ui';
 
 export function UsersPage() {
-  const [from, setFrom] = useStickyState('users.from', () => daysAgoIso(7));
+  const [from, setFrom] = useStickyState('users.from', () => todayIso());
   const [to, setTo] = useStickyState('users.to', () => todayIso());
   const [q, setQ] = useStickyState('users.q', () => '');
   const [sort, setSort] = useStickyState('users.sort', () => 'createdAt');

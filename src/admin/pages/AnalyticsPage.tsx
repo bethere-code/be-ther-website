@@ -2,7 +2,7 @@ import { go } from '../../hooks/usePathRoute';
 import { dayEndIso, dayStartIso, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
-import { daysAgoIso, todayIso } from '../dates';
+import { todayIso } from '../dates';
 import { SessionActivityTable } from '../activityTables';
 import type { AnalyticsSession } from '../groupAnalyticsSessions';
 import { Pager } from '../Pager';
@@ -19,7 +19,7 @@ type SessionsResponse = {
 
 export function AnalyticsPage() {
   const [type, setType] = useStickyState('analytics.type', () => 'screen_time');
-  const [from, setFrom] = useStickyState('analytics.from', () => daysAgoIso(7));
+  const [from, setFrom] = useStickyState('analytics.from', () => todayIso());
   const [to, setTo] = useStickyState('analytics.to', () => todayIso());
   const [sort, setSort] = useStickyState<'occurredAt' | 'durationMs'>('analytics.sort', () => 'occurredAt');
   const [dir, setDir] = useStickyState<'asc' | 'desc'>('analytics.dir', () => 'desc');

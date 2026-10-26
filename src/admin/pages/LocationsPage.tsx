@@ -1,9 +1,10 @@
 import { Building2, MapPin, MapPinOff, UserPlus } from 'lucide-react';
+import { useState } from 'react';
 import { go } from '../../hooks/usePathRoute';
 import { dayEndIso, dayStartIso, fmtDate, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
-import { daysAgoIso, todayIso } from '../dates';
+import { todayIso } from '../dates';
 import { DateRange, Empty, ErrorBox, fmtRangeLabel, Panel, StatCard, TableWrap, td, th } from '../ui';
 
 type CityRow = { city: string; users: number; newInRange: number };
@@ -26,8 +27,11 @@ type Locations = {
   };
   firstCities: CityRow[];
   currentCities: CityRow[];
-  moves: { from: string; to: string; users: number }[];
+  // moves: { from: string; to: string; users: number }[];
   noLocationZones: { timezone: string; users: number }[];
+  eventCities: { city: string; events: number; newInRange: number }[];
+  eventsWithCity: number;
+  eventsWithoutCity: number;
   recent: {
     id: string;
     username: string;
@@ -49,7 +53,9 @@ const accessLabel: Record<Access, { text: string; cls: string }> = {
 
 const pct = (n: number, of: number) => (of > 0 ? Math.round((n / of) * 100) : 0);
 
-/** Horizontal bar list: label, bar scaled to the top row, count, share of [total]. */
+const COLLAPSED_ROWS = 5;
+
+/** Horizontal bar list: label, bar scaled to the top row, count, share of [total]. Top 5 until expanded. */
 function Bars({
   rows,
   total,
@@ -59,29 +65,43 @@ function Bars({
   total: number;
   barClass: string;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const max = Math.max(1, ...rows.map((r) => r.users));
+  const shown = expanded ? rows : rows.slice(0, COLLAPSED_ROWS);
   return (
-    <ul className="space-y-2.5">
-      {rows.map((r) => (
-        <li key={r.label} className="grid grid-cols-[minmax(6rem,9rem)_1fr_auto] items-center gap-3 text-sm">
-          <span className="truncate font-medium text-ink-900" title={r.label}>
-            {r.label}
-          </span>
-          <div className="h-3 overflow-hidden rounded-full bg-cream-100" aria-hidden>
-            <div className={`h-full rounded-full ${barClass}`} style={{ width: `${(r.users / max) * 100}%` }} />
-          </div>
-          <span className="whitespace-nowrap text-right tabular-nums text-ink-700">
-            <span className="font-semibold text-ink-950">{r.users}</span>
-            <span className="ml-1.5 text-xs text-ink-500">{pct(r.users, total)}%</span>
-            {r.newInRange ? (
-              <span className="ml-1.5 rounded-full bg-coral-100 px-1.5 py-0.5 text-[10px] font-semibold text-coral-800">
-                +{r.newInRange} new
-              </span>
-            ) : null}
-          </span>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <ul className="space-y-2.5">
+        {shown.map((r) => (
+          <li key={r.label} className="grid grid-cols-[minmax(6rem,9rem)_1fr_auto] items-center gap-3 text-sm">
+            <span className="truncate font-medium text-ink-900" title={r.label}>
+              {r.label}
+            </span>
+            <div className="h-3 overflow-hidden rounded-full bg-cream-100" aria-hidden>
+              <div className={`h-full rounded-full ${barClass}`} style={{ width: `${(r.users / max) * 100}%` }} />
+            </div>
+            <span className="whitespace-nowrap text-right tabular-nums text-ink-700">
+              <span className="font-semibold text-ink-950">{r.users}</span>
+              <span className="ml-1.5 text-xs text-ink-500">{pct(r.users, total)}%</span>
+              {r.newInRange ? (
+                <span className="ml-1.5 rounded-full bg-coral-100 px-1.5 py-0.5 text-[10px] font-semibold text-coral-800">
+                  +{r.newInRange} new
+                </span>
+              ) : null}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {rows.length > COLLAPSED_ROWS ? (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 h-9 rounded-lg px-3 text-xs font-semibold text-coral-700 hover:bg-coral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral-500"
+        >
+          {expanded ? `Show top ${COLLAPSED_ROWS}` : `Show all ${rows.length}`}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -91,7 +111,7 @@ function CityBars({ rows, total, barClass }: { rows: CityRow[]; total: number; b
 }
 
 export function LocationsPage() {
-  const [from, setFrom] = useStickyState('locations.from', () => daysAgoIso(30));
+  const [from, setFrom] = useStickyState('locations.from', () => todayIso());
   const [to, setTo] = useStickyState('locations.to', () => todayIso());
   const url = `/api/v1/admin/locations${toQuery({ from: dayStartIso(from), to: dayEndIso(to) })}`;
   const { data, error, reload } = useAdminQuery<Locations>(url);
@@ -133,7 +153,7 @@ export function LocationsPage() {
             />
             <StatCard label="Cities" value={t.cities} tone="coral" icon={Building2} detail="current" />
             <StatCard
-              label="New users with location"
+              label="Joined in range · with location"
               value={`${t.newAllowed}/${t.newUsers}`}
               tone="amber"
               icon={UserPlus}
@@ -157,6 +177,24 @@ export function LocationsPage() {
           </div>
 
           <div className="grid gap-4 xl:grid-cols-2">
+            <Panel title={`Events by city · ${data.eventsWithCity + data.eventsWithoutCity} events`}>
+              {!data.eventCities.length ? (
+                <Empty text="No events with a city yet." />
+              ) : (
+                <Bars
+                  rows={data.eventCities.map((r) => ({ label: r.city, users: r.events, newInRange: r.newInRange }))}
+                  total={data.eventsWithCity}
+                  barClass="bg-success-500"
+                />
+              )}
+              {data.eventsWithoutCity > 0 ? (
+                <p className="mt-4 text-xs text-ink-500">
+                  {data.eventsWithoutCity} event{data.eventsWithoutCity === 1 ? ' has' : 's have'} no city on the venue
+                  and {data.eventsWithoutCity === 1 ? 'is' : 'are'} not counted.
+                </p>
+              ) : null}
+            </Panel>
+            {/* Moved city — hidden for now; re-enable together with `moves` in admin-locations.ts.
             <Panel title={`Moved city · ${t.moved} user${t.moved === 1 ? '' : 's'}`}>
               {!data.moves.length ? (
                 <Empty text="Nobody has moved city yet." />
@@ -183,6 +221,7 @@ export function LocationsPage() {
                 </TableWrap>
               )}
             </Panel>
+            */}
             <Panel title={`No location · phone timezone (${noLocation})`}>
               {!data.noLocationZones.length ? (
                 <Empty text="Everyone shared their location." />

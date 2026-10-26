@@ -2,7 +2,7 @@ import { DateRange, Empty, ErrorBox, field, fieldLabel, Panel, TableWrap, th } f
 import { dayEndIso, dayStartIso, idOf, toQuery } from './api';
 import { useAdminQuery } from './useAdminQuery';
 import { useStickyState } from './adminFilters';
-import { daysAgoIso, todayIso } from './dates';
+import { todayIso } from './dates';
 import { Pager } from './Pager';
 
 export function ListPage({
@@ -20,7 +20,7 @@ export function ListPage({
   extra?: Record<string, string | undefined>;
   toolbar?: React.ReactNode;
 }) {
-  const [from, setFrom] = useStickyState(`list.${path}.from`, () => daysAgoIso(7));
+  const [from, setFrom] = useStickyState(`list.${path}.from`, () => todayIso());
   const [to, setTo] = useStickyState(`list.${path}.to`, () => todayIso());
   const [dir, setDir] = useStickyState(`list.${path}.dir`, () => 'desc');
   const [page, setPage] = useStickyState(`list.${path}.page`, () => 1);

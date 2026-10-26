@@ -72,12 +72,13 @@ export function toQuery(params: Record<string, string | number | undefined | nul
   return s ? `?${s}` : '';
 }
 
+/** Date-filter day bounds in India time (IST has no DST), like [fmtDate]. */
 export function dayStartIso(date: string): string {
-  return new Date(`${date}T00:00:00.000Z`).toISOString();
+  return new Date(`${date}T00:00:00.000+05:30`).toISOString();
 }
 
 export function dayEndIso(date: string): string {
-  return new Date(`${date}T23:59:59.999Z`).toISOString();
+  return new Date(`${date}T23:59:59.999+05:30`).toISOString();
 }
 
 const IST = 'Asia/Kolkata';
