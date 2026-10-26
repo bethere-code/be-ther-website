@@ -7,6 +7,7 @@ import {
   LogOut,
   MapPin,
   Menu,
+  Smartphone,
   Sparkles,
   Users as UsersIcon,
   X,
@@ -16,6 +17,7 @@ import { go, Link } from '../hooks/usePathRoute';
 import { adminEmail, clearSession } from './api';
 import {
   AnalyticsPage,
+  AppUpdatesPage,
   LocationsPage,
   NudgesPage,
   OverviewPage,
@@ -35,6 +37,7 @@ const nav = [
   { to: '/admin/analytics', label: 'Analytics', icon: Activity },
   { to: '/admin/push', label: 'Push', icon: Bell },
   { to: '/admin/nudges', label: 'Nudges', icon: Sparkles },
+  { to: '/admin/app-updates', label: 'App updates', icon: Smartphone },
   { to: '/admin/reports', label: 'Reports', icon: Flag },
 ];
 
@@ -125,6 +128,7 @@ export function Shell({ path }: { path: string }) {
             {path === '/admin/analytics' ? <AnalyticsPage /> : null}
             {path === '/admin/push' ? <PushPage /> : null}
             {path === '/admin/nudges' ? <NudgesPage /> : null}
+            {path === '/admin/app-updates' ? <AppUpdatesPage /> : null}
             {path === '/admin/reports' ? <ReportsPage /> : null}
           </main>
         </div>
