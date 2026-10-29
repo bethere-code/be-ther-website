@@ -33,7 +33,7 @@ const nav = [
   { to: '/admin/overview', label: 'Overview', icon: LayoutDashboard },
   { to: '/admin/users', label: 'Users', icon: UsersIcon },
   { to: '/admin/locations', label: 'Locations', icon: MapPin },
-  { to: '/admin/posts', label: 'Posts', icon: Image },
+  { to: '/admin/posts', label: 'Events', icon: Image },
   { to: '/admin/analytics', label: 'Analytics', icon: Activity },
   { to: '/admin/push', label: 'Push', icon: Bell },
   { to: '/admin/nudges', label: 'Nudges', icon: Sparkles },

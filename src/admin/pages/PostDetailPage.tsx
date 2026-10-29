@@ -1,4 +1,4 @@
-import { CalendarCheck, ExternalLink, Heart, Image, UserPlus } from 'lucide-react';
+import { CalendarCheck, ExternalLink, Heart, Image, MapPin, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { go, Link } from '../../hooks/usePathRoute';
 import { fmtDate, toQuery } from '../api';
@@ -6,6 +6,19 @@ import { useAdminQuery } from '../useAdminQuery';
 import { Empty, ErrorBox, Panel } from '../ui';
 
 type PeopleKind = 'likes' | 'interested' | 'going';
+
+type EventPlace = { placeId?: string; name?: string; formattedAddress?: string; lat?: number; lng?: number };
+
+/** Google Maps URL (official `api=1` format); the place id pins the exact venue when we have one. */
+function mapsUrl(place: EventPlace | undefined, venue: string): string | null {
+  const text = [venue, place?.formattedAddress?.trim()].filter(Boolean).join(', ');
+  const hasPoint = typeof place?.lat === 'number' && typeof place?.lng === 'number';
+  const query = text || (hasPoint ? `${place!.lat},${place!.lng}` : '');
+  if (!query) return null;
+  const placeId = place?.placeId?.trim() ?? '';
+  const pinned = placeId && !placeId.startsWith('geo:') ? `&query_place_id=${encodeURIComponent(placeId)}` : '';
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}${pinned}`;
+}
 
 export function PostDetailPage({ id }: { id: string }) {
   const [peopleKind, setPeopleKind] = useState<PeopleKind | null>(null);
@@ -35,9 +48,12 @@ export function PostDetailPage({ id }: { id: string }) {
     | undefined;
   const image = String(p?.imageUrl ?? '');
   const details = p?.eventDetails as
-    | { date?: string; time?: string; venue?: string; ticketUrl?: string }
+    | { date?: string; time?: string; venue?: string; ticketUrl?: string; eventLocation?: EventPlace }
     | undefined;
   const ticketUrl = String(details?.ticketUrl ?? '').trim();
+  const venue = String(details?.venue || details?.eventLocation?.name || '').trim();
+  const address = String(details?.eventLocation?.formattedAddress ?? '').trim();
+  const venueMapsUrl = mapsUrl(details?.eventLocation, venue);
 
   return (
     <div className="space-y-5">
@@ -45,7 +61,7 @@ export function PostDetailPage({ id }: { id: string }) {
         to="/admin/posts"
         className="inline-flex text-sm font-medium text-ink-500 transition-colors hover:text-coral-600"
       >
-        ← Posts
+        ← Events
       </Link>
       {error ? <ErrorBox message={error} onRetry={reload} /> : null}
       {p && data ? (
@@ -94,7 +110,27 @@ export function PostDetailPage({ id }: { id: string }) {
                 <dt className="text-ink-500">When</dt>
                 <dd>{[details?.date, details?.time].filter(Boolean).join(' · ') || '—'}</dd>
                 <dt className="text-ink-500">Venue</dt>
-                <dd className="truncate">{details?.venue || '—'}</dd>
+                <dd className="min-w-0">
+                  {venueMapsUrl ? (
+                    <a
+                      href={venueMapsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Open in Google Maps"
+                      className="group inline-flex gap-1.5 rounded text-ink-950 hover:text-coral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral-500"
+                    >
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral-600" aria-hidden />
+                      <span>
+                        <span className="font-medium group-hover:underline">{venue || address}</span>
+                        {venue && address && address !== venue ? (
+                          <span className="block text-ink-500">{address}</span>
+                        ) : null}
+                      </span>
+                    </a>
+                  ) : (
+                    venue || '—'
+                  )}
+                </dd>
                 <dt className="text-ink-500">Posted</dt>
                 <dd>{fmtDate(p.createdAt as string)} IST</dd>
               </dl>

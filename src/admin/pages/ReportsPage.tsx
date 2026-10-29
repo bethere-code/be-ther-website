@@ -8,7 +8,7 @@ export function ReportsPage() {
       <ListPage
         title="Event reports"
         path="/api/v1/admin/reports"
-        columns={['Type', 'Reporter', 'Post', 'When']}
+        columns={['Type', 'Reporter', 'Event', 'When']}
         render={(r) => {
           const reporter = r.reporterId as { username?: string } | undefined;
           const post = r.postId as { location?: string } | undefined;

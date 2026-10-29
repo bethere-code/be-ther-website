@@ -1,15 +1,16 @@
-import { Building2, MapPin, MapPinOff, UserPlus } from 'lucide-react';
+import { Building2, MapPin, MapPinOff } from 'lucide-react';
 import { useState } from 'react';
 import { go } from '../../hooks/usePathRoute';
 import { dayEndIso, dayStartIso, fmtDate, toQuery } from '../api';
 import { useAdminQuery } from '../useAdminQuery';
 import { useStickyState } from '../adminFilters';
 import { todayIso } from '../dates';
-import { DateRange, Empty, ErrorBox, fmtRangeLabel, Panel, StatCard, TableWrap, td, th } from '../ui';
+import { DateRange, Empty, ErrorBox, Panel, StatCard, TableWrap, td, th } from '../ui';
 
-type CityRow = { city: string; users: number; newInRange: number };
+type CityRow = { city: string; users: number };
 type Access = 'allowed' | 'denied' | 'blocked' | 'unanswered';
 
+/** Everything here covers users who joined / events posted in the selected range. */
 type Locations = {
   totals: {
     users: number;
@@ -17,8 +18,6 @@ type Locations = {
     denied: number;
     blocked: number;
     unanswered: number;
-    newUsers: number;
-    newAllowed: number;
     firstEstimated: number;
     moved: number;
     cities: number;
@@ -29,7 +28,7 @@ type Locations = {
   currentCities: CityRow[];
   // moves: { from: string; to: string; users: number }[];
   noLocationZones: { timezone: string; users: number }[];
-  eventCities: { city: string; events: number; newInRange: number }[];
+  eventCities: { city: string; events: number }[];
   eventsWithCity: number;
   eventsWithoutCity: number;
   recent: {
@@ -61,7 +60,7 @@ function Bars({
   total,
   barClass,
 }: {
-  rows: { label: string; users: number; newInRange?: number }[];
+  rows: { label: string; users: number }[];
   total: number;
   barClass: string;
 }) {
@@ -82,11 +81,6 @@ function Bars({
             <span className="whitespace-nowrap text-right tabular-nums text-ink-700">
               <span className="font-semibold text-ink-950">{r.users}</span>
               <span className="ml-1.5 text-xs text-ink-500">{pct(r.users, total)}%</span>
-              {r.newInRange ? (
-                <span className="ml-1.5 rounded-full bg-coral-100 px-1.5 py-0.5 text-[10px] font-semibold text-coral-800">
-                  +{r.newInRange} new
-                </span>
-              ) : null}
             </span>
           </li>
         ))}
@@ -106,8 +100,8 @@ function Bars({
 }
 
 function CityBars({ rows, total, barClass }: { rows: CityRow[]; total: number; barClass: string }) {
-  if (!rows.length) return <Empty text="No city data yet." />;
-  return <Bars rows={rows.map((r) => ({ ...r, label: r.city }))} total={total} barClass={barClass} />;
+  if (!rows.length) return <Empty text="No city data in this range." />;
+  return <Bars rows={rows.map((r) => ({ label: r.city, users: r.users }))} total={total} barClass={barClass} />;
 }
 
 export function LocationsPage() {
@@ -121,14 +115,7 @@ export function LocationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink-950">Locations</h1>
-          <p className="mt-1 text-sm text-ink-500">
-            Totals cover all users
-            <span className="mx-2 text-ink-300">·</span>
-            “New” = joined {fmtRangeLabel(from, to)}
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-ink-950">Locations</h1>
         <DateRange from={from} to={to} onFrom={setFrom} onTo={setTo} />
       </div>
 
@@ -136,13 +123,13 @@ export function LocationsPage() {
 
       {data && t ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
               label="Location allowed"
               value={t.allowed}
               tone="success"
               icon={MapPin}
-              detail={`${pct(t.allowed, t.users)}% of ${t.users}`}
+              detail={`${pct(t.allowed, t.users)}% of ${t.users} joined`}
             />
             <StatCard
               label="No location"
@@ -152,13 +139,6 @@ export function LocationsPage() {
               detail={`${t.denied + t.blocked} denied · ${t.unanswered} never answered`}
             />
             <StatCard label="Cities" value={t.cities} tone="coral" icon={Building2} detail="current" />
-            <StatCard
-              label="Joined in range · with location"
-              value={`${t.newAllowed}/${t.newUsers}`}
-              tone="amber"
-              icon={UserPlus}
-              detail={`${pct(t.newAllowed, t.newUsers)}%`}
-            />
           </div>
 
           <div className="grid gap-4 xl:grid-cols-2">
@@ -179,10 +159,10 @@ export function LocationsPage() {
           <div className="grid gap-4 xl:grid-cols-2">
             <Panel title={`Events by city · ${data.eventsWithCity + data.eventsWithoutCity} events`}>
               {!data.eventCities.length ? (
-                <Empty text="No events with a city yet." />
+                <Empty text="No events with a city in this range." />
               ) : (
                 <Bars
-                  rows={data.eventCities.map((r) => ({ label: r.city, users: r.events, newInRange: r.newInRange }))}
+                  rows={data.eventCities.map((r) => ({ label: r.city, users: r.events }))}
                   total={data.eventsWithCity}
                   barClass="bg-success-500"
                 />
@@ -240,7 +220,7 @@ export function LocationsPage() {
             </Panel>
           </div>
 
-          <Panel title={`Recent joiners · ${t.newUsers} in range`}>
+          <Panel title={`Recent joiners · ${t.users}${t.users > data.recent.length ? ` (latest ${data.recent.length} shown)` : ''}`}>
             {!data.recent.length ? (
               <Empty text="Nobody joined in this range." />
             ) : (
@@ -294,8 +274,8 @@ export function LocationsPage() {
           </Panel>
         </>
       ) : !error ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid gap-4 sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-[7.5rem] animate-pulse rounded-2xl bg-cream-200/80" />
           ))}
         </div>

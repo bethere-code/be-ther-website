@@ -31,6 +31,19 @@ function locationLine(d?: Record<string, unknown>): string | null {
   return `${lat.toFixed(5)}, ${lng.toFixed(5)}${acc}`;
 }
 
+/** `city_hyderabad` → `Hyderabad` (the app stores the latest synced city as an FCM topic slug). */
+function currentCityLabel(topic: unknown): string | null {
+  if (typeof topic !== 'string') return null;
+  const m = /^city_([a-z0-9_]+)$/.exec(topic.trim());
+  if (!m) return null;
+  const label = m[1]
+    .split('_')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  return label || null;
+}
+
 function permLabel(entry?: { granted?: boolean } | null): 'On' | 'Off' {
   return entry?.granted === true ? 'On' : 'Off';
 }
@@ -74,6 +87,7 @@ export function UserDetailPage({ id }: { id: string }) {
     (u?.lastActiveAt as string | undefined) || (last?.at as string | undefined);
   const firstLoc = locationLine(first);
   const lastLoc = locationLine(last);
+  const currentCity = currentCityLabel(u?.fcmCityTopic);
   const settings = u?.settings as Record<string, unknown> | undefined;
   const devicePerms = u?.devicePermissions as
     | {
@@ -127,6 +141,17 @@ export function UserDetailPage({ id }: { id: string }) {
                 <dd>{fmtDate(u.createdAt as string)} IST</dd>
                 <dt className="text-ink-500">First city</dt>
                 <dd>{String(u.firstCity || '—')}</dd>
+                <dt className="text-ink-500">Current city</dt>
+                <dd>
+                  {currentCity ?? (lastLoc ? (
+                    <span className="text-ink-600">
+                      {lastLoc}
+                      <span className="ml-2 text-xs text-ink-500">last login coords</span>
+                    </span>
+                  ) : (
+                    '—'
+                  ))}
+                </dd>
                 <dt className="text-ink-500">FCM</dt>
                 <dd className="break-all text-xs text-ink-600">{String(u.fcmToken || '—')}</dd>
                 <dt className="text-ink-500">Auth</dt>

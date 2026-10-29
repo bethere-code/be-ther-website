@@ -30,7 +30,7 @@ export function PostsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-ink-950">Posts</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink-950">Events</h1>
         <p className="mt-1 text-sm text-ink-500">
           {fmtRangeLabel(from, to)}
           <span className="mx-2 text-ink-300">·</span>
@@ -84,7 +84,7 @@ export function PostsPage() {
       {error ? <ErrorBox message={error} onRetry={reload} /> : null}
 
       {!rows?.items.length && !error ? (
-        <Empty text="No posts in this filter." />
+        <Empty text="No events in this filter." />
       ) : (
         <>
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">

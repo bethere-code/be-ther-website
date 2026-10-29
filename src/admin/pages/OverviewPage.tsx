@@ -11,7 +11,7 @@ const laterIdeas = [
   'CSV export for a date range',
   'OTP attempt spikes (abuse / stuffing)',
   'Push-token health after Firebase lands',
-  'City breakdown from post eventLocation',
+  'City breakdown from event location',
 ];
 
 export type Overview = {
@@ -52,7 +52,7 @@ export function OverviewPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Signups" value={data.usersInRange} tone="coral" icon={UserPlus} />
-            <StatCard label="New posts" value={data.postsInRange} tone="ink" icon={Image} />
+            <StatCard label="New events" value={data.postsInRange} tone="ink" icon={Image} />
             <StatCard
               label="Screen time"
               value={fmtMs(data.screenTimeMs)}
