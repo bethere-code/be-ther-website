@@ -11,6 +11,7 @@ import { FAQ } from './components/FAQ';
 import { CTA } from './components/CTA';
 import { Footer } from './components/Footer';
 import { PrivacyPage, TermsPage } from './components/LegalPages';
+import { DeleteAccountPage } from './components/DeleteAccount';
 import { AdminApp } from './admin/AdminApp';
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
 
   useEffect(() => {
     const hash = window.location.hash.replace(/^#\/?/, '');
-    if (hash === 'privacy' || hash === 'terms') {
+    if (hash === 'privacy' || hash === 'terms' || hash === 'delete-account') {
       window.history.replaceState({}, '', `/${hash}`);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
@@ -28,6 +29,7 @@ function App() {
   if (route.startsWith('/admin')) return <AdminApp path={route} />;
   if (route === '/privacy') return <PrivacyPage />;
   if (route === '/terms') return <TermsPage />;
+  if (route === '/delete-account') return <DeleteAccountPage />;
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-ink-950">

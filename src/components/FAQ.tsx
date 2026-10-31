@@ -4,27 +4,19 @@ import { ChevronDown } from 'lucide-react';
 const faqs = [
   {
     q: 'What is Be Ther?',
-    a: 'Be Ther is a social calendar app. You post upcoming events, share them with friends and family, buy tickets when needed, and see who else is going — all in one place.',
+    a: 'A social calendar app. Post events, share them with your circle, and see who\u2019s going — all in one place.',
   },
   {
-    q: 'Is Be Ther free to use?',
-    a: 'Yes. Creating an account, posting events, and sharing invites is free. You only pay for tickets when an event charges for entry.',
+    q: 'Is it free?',
+    a: 'Yes. Creating an account and posting events is free. You only pay for tickets when an event charges for entry.',
   },
   {
-    q: 'Where can I download it?',
-    a: 'Be Ther is available on iOS and Android. Enter your email in the Get the app section and we\u2019ll send you a download link.',
+    q: 'Where can I get it?',
+    a: 'Be Ther is live on Android via the Google Play Store. The iOS app arrives in November 2026.',
   },
   {
     q: 'Who can see my events?',
-    a: 'You choose. Share with a private group of friends and family, or open it up to your wider circle. You\u2019re always in control of who sees what.',
-  },
-  {
-    q: 'How do tickets work?',
-    a: 'When an event requires a ticket, you can buy it directly in the app. Your pass is saved with the event details and ready to show at the door.',
-  },
-  {
-    q: 'Is my information safe?',
-    a: 'We take privacy seriously. You can read our Privacy Policy and Terms of Service for the full details on how we handle your data.',
+    a: 'You choose. Share with a private group or open it up to your wider circle. You\u2019re always in control.',
   },
 ];
 
@@ -34,14 +26,14 @@ export function FAQ() {
   return (
     <section id="faq" className="relative py-20 sm:py-28">
       <div className="container-page">
-        <div className="reveal mx-auto max-w-2xl text-center">
+        <div className="reveal mx-auto max-w-xl text-center">
           <span className="eyebrow">FAQ</span>
-          <h2 className="mt-5 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Questions, answered
+          <h2 className="mt-5 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Good to know
           </h2>
         </div>
 
-        <div className="reveal mx-auto mt-12 max-w-3xl space-y-3">
+        <div className="reveal mx-auto mt-12 max-w-2xl space-y-3">
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (
@@ -70,7 +62,7 @@ export function FAQ() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-6 pb-5 text-sm leading-relaxed text-cream-200/70">{f.a}</p>
+                    <p className="px-6 pb-5 text-sm leading-relaxed text-cream-200/60">{f.a}</p>
                   </div>
                 </div>
               </div>

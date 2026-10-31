@@ -1,75 +1,62 @@
-import { Logo } from './Logo';
+import { Mail, Phone } from 'lucide-react';
 import { Link } from '../hooks/usePathRoute';
+import { Logo } from './Logo';
 
-const groups = [
-  {
-    title: 'Product',
-    links: [
-      { label: 'Features', href: '#features' },
-      { label: 'How it works', href: '#how' },
-      { label: 'Get the app', href: '#get-the-app' },
-      { label: 'FAQ', href: '#faq' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'Contact Us', href: 'mailto:be.there.accnts@gmail.com' },
-    ],
-  },
-];
+const PLAY_STORE = 'https://play.google.com/store/apps/details?id=com.bether.app&hl=en_IN';
 
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-ink-950">
-      <div className="container-page py-14">
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
-          <div>
+      <div className="container-page py-12">
+        <div className="flex flex-col items-center gap-8 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div className="flex flex-col items-center gap-3 sm:items-start">
             <Logo />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-200/50">
-              A social calendar for the moments that bring people together. Plan together. Show up
-              together.
+            <p className="max-w-xs text-sm leading-relaxed text-cream-200/40">
+              A social calendar for the moments that bring people together.
             </p>
           </div>
 
-          {groups.map((g) => (
-            <div key={g.title}>
-              <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-cream-200/80">
-                {g.title}
-              </h4>
-              <ul className="mt-4 space-y-3">
-                {g.links.map((l) => (
-                  <li key={l.label}>
-                    {l.href.startsWith('/') ? (
-                      <Link
-                        to={l.href}
-                        className="text-sm text-cream-200/50 transition-colors hover:text-white"
-                      >
-                        {l.label}
-                      </Link>
-                    ) : (
-                      <a
-                        href={l.href}
-                        className="text-sm text-cream-200/50 transition-colors hover:text-white"
-                      >
-                        {l.label}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
+          <div className="flex flex-col items-center gap-3 sm:items-end">
+            <a href={PLAY_STORE} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              Get the app
+            </a>
+            <div className="flex gap-5 text-sm text-cream-200/40">
+              <Link to="/privacy" className="transition-colors hover:text-white">Privacy</Link>
+              <Link to="/terms" className="transition-colors hover:text-white">Terms</Link>
+              <Link to="/delete-account" className="transition-colors hover:text-white">Delete Account</Link>
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
-          <p className="text-xs text-cream-200/50">
-            © {new Date().getFullYear()} Be Ther. All rights reserved.
-          </p>
-          <p className="text-xs text-cream-200/50">
-            Made for the people who show up.
+        <div className="mt-10 border-t border-white/10 pt-6">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm font-medium text-cream-200/70">
+                Gomatham Applications Private Limited
+              </p>
+              <p className="text-xs tracking-widest text-cream-200/40">ESTD 2026</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-6">
+              <a
+                href="tel:916003383"
+                className="flex items-center gap-1.5 text-sm text-cream-200/60 transition-colors hover:text-white"
+              >
+                <Phone size={14} />
+                916003383
+              </a>
+              <a
+                href="mailto:be.there.accnts@gmail.com"
+                className="flex items-center gap-1.5 text-sm text-cream-200/60 transition-colors hover:text-white"
+              >
+                <Mail size={14} />
+                be.there.accnts@gmail.com
+              </a>
+            </div>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-cream-200/40">
+            © {new Date().getFullYear()} Be Ther. Made for the people who show up.
           </p>
         </div>
       </div>
