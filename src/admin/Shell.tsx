@@ -10,6 +10,7 @@ import {
   Smartphone,
   Sparkles,
   Users as UsersIcon,
+  Megaphone,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -18,6 +19,7 @@ import { adminEmail, clearSession } from './api';
 import {
   AnalyticsPage,
   AppUpdatesPage,
+  HomePromoPage,
   LocationsPage,
   NudgesPage,
   OverviewPage,
@@ -38,6 +40,7 @@ const nav = [
   { to: '/admin/push', label: 'Push', icon: Bell },
   { to: '/admin/nudges', label: 'Nudges', icon: Sparkles },
   { to: '/admin/app-updates', label: 'App updates', icon: Smartphone },
+  { to: '/admin/home-promo', label: 'Home promo', icon: Megaphone },
   { to: '/admin/reports', label: 'Reports', icon: Flag },
 ];
 
@@ -129,6 +132,7 @@ export function Shell({ path }: { path: string }) {
             {path === '/admin/push' ? <PushPage /> : null}
             {path === '/admin/nudges' ? <NudgesPage /> : null}
             {path === '/admin/app-updates' ? <AppUpdatesPage /> : null}
+            {path === '/admin/home-promo' ? <HomePromoPage /> : null}
             {path === '/admin/reports' ? <ReportsPage /> : null}
           </main>
         </div>

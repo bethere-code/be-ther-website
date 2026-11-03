@@ -1,5 +1,6 @@
 export { AnalyticsPage } from './AnalyticsPage';
 export { AppUpdatesPage } from './AppUpdatesPage';
+export { HomePromoPage } from './HomePromoPage';
 export { LocationsPage } from './LocationsPage';
 export { OverviewPage } from './OverviewPage';
 export { NudgesPage } from './NudgesPage';
