@@ -177,11 +177,11 @@ export function HomePromoPage() {
     <div className="mx-auto flex max-w-3xl flex-col gap-5">
       <div>
         <h1 className="font-display text-2xl font-bold tracking-tight text-ink-950">Home promo</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-600">
+        {/* <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-600">
           One dismissable popup on the feed (after the signup welcome). Saving always starts a new
           campaign so users see the updated content soon. Title and image are both optional when
           Off; when On you need at least one of them.
-        </p>
+        </p> */}
       </div>
 
       <Panel title="Master">
@@ -190,43 +190,42 @@ export function HomePromoPage() {
           checked={draft.enabled}
           onChange={(v) => patch('enabled', v)}
           label="Show home promo"
-          hint="Off = nobody sees it. Required app-update always wins over this popup."
         />
       </Panel>
 
       <Panel title="Content">
-        <div className="grid gap-4">
-          <label className="block">
+        <div className="flex flex-col gap-5">
+          <label className="flex flex-col gap-1.5">
             <span className={fieldLabel}>Title</span>
             <input
-              className={field}
+              className={`${field} w-full`}
               value={draft.title}
               maxLength={80}
               placeholder="What's new"
               onChange={(e) => patch('title', e.target.value)}
             />
           </label>
-          <label className="block">
+          <label className="flex flex-col gap-1.5">
             <span className={fieldLabel}>Subtitle (optional)</span>
             <textarea
-              className={`${field} min-h-[4.5rem] resize-y`}
+              className="min-h-[4.5rem] w-full resize-y rounded-lg border border-ink-950/12 bg-white px-2.5 py-2 text-sm text-ink-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral-500/40"
               value={draft.subtitle}
               maxLength={200}
               placeholder="Short supporting line"
               onChange={(e) => patch('subtitle', e.target.value)}
             />
           </label>
-          <div>
+          <div className="flex flex-col gap-1.5">
             <span className={fieldLabel}>Image (optional)</span>
-            <div className="mt-1 flex flex-wrap items-start gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {draft.imageUrl ? (
                 <img
                   src={draft.imageUrl}
                   alt=""
-                  className="h-28 w-28 rounded-xl border border-ink-950/10 object-cover"
+                  className="h-28 w-28 shrink-0 rounded-xl border border-ink-950/10 object-cover"
                 />
               ) : (
-                <div className="grid h-28 w-28 place-items-center rounded-xl border border-dashed border-ink-950/15 bg-cream-50 text-ink-400">
+                <div className="grid h-28 w-28 shrink-0 place-items-center rounded-xl border border-dashed border-ink-950/15 bg-cream-50 text-ink-400">
                   <ImagePlus className="h-6 w-6" aria-hidden />
                 </div>
               )}
@@ -264,11 +263,11 @@ export function HomePromoPage() {
       </Panel>
 
       <Panel title="Button">
-        <div className="grid gap-4">
-          <label className="block">
+        <div className="flex flex-col gap-5">
+          <label className="flex flex-col gap-1.5">
             <span className={fieldLabel}>Label (optional — default GOT IT)</span>
             <input
-              className={field}
+              className={`${field} w-full`}
               value={draft.buttonLabel}
               maxLength={40}
               placeholder="GOT IT"
@@ -316,10 +315,10 @@ export function HomePromoPage() {
             </div>
           </fieldset>
           {draft.buttonTarget === 'external' ? (
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className={fieldLabel}>https:// link</span>
               <input
-                className={field}
+                className={`${field} w-full`}
                 value={draft.buttonUrl}
                 maxLength={500}
                 placeholder="https://…"
@@ -328,16 +327,16 @@ export function HomePromoPage() {
             </label>
           ) : null}
           {draft.buttonTarget === 'event' ? (
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className={fieldLabel}>Event id</span>
               <input
-                className={field}
+                className={`${field} w-full`}
                 value={draft.buttonUrl}
                 maxLength={24}
                 placeholder="Paste id from the event detail URL"
                 onChange={(e) => patch('buttonUrl', e.target.value.trim())}
               />
-              <span className="mt-1 block text-xs text-ink-500">
+              <span className="text-xs text-ink-500">
                 Open Events → an event; the URL ends with <code>/admin/posts/&lt;id&gt;</code>. Use that id.
               </span>
             </label>
@@ -402,19 +401,19 @@ export function HomePromoPage() {
             </div>
           </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className={fieldLabel}>Starts on (optional)</span>
               <input
-                className={field}
+                className={`${field} w-full`}
                 type="date"
                 value={draft.startsOn}
                 onChange={(e) => patch('startsOn', e.target.value)}
               />
             </label>
-            <label className="block">
+            <label className="flex flex-col gap-1.5">
               <span className={fieldLabel}>Ends on (optional)</span>
               <input
-                className={field}
+                className={`${field} w-full`}
                 type="date"
                 value={draft.endsOn}
                 onChange={(e) => patch('endsOn', e.target.value)}
