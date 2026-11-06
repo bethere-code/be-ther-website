@@ -14,6 +14,7 @@ type HomePromo = {
   title: string;
   subtitle: string;
   imageUrl: string;
+  showButton: boolean;
   buttonLabel: string;
   buttonTarget: ButtonTarget;
   buttonUrl: string;
@@ -99,11 +100,17 @@ export function HomePromoPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (data) setDraft({ ...data });
+    if (data) setDraft({ ...data, showButton: data.showButton !== false });
   }, [data]);
 
   function patch<K extends keyof HomePromo>(key: K, value: HomePromo[K]) {
-    setDraft((prev) => (prev ? { ...prev, [key]: value } : prev));
+    setDraft((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, [key]: value };
+      // No image → button cannot be hidden.
+      if (key === 'imageUrl' && !String(value).trim()) next.showButton = true;
+      return next;
+    });
     setSavedAt(null);
   }
 
@@ -124,8 +131,13 @@ export function HomePromoPage() {
 
   async function save() {
     if (!draft) return;
-    if (draft.enabled && !draft.title.trim() && !draft.imageUrl.trim()) {
-      setError('When On, add a title and/or an image.');
+    const hasImage = Boolean(draft.imageUrl.trim());
+    if (draft.enabled && !hasImage && !draft.title.trim()) {
+      setError('When On without an image, a title is required.');
+      return;
+    }
+    if (!draft.showButton && !hasImage) {
+      setError('Hide button only works when an image is set.');
       return;
     }
     if (draft.buttonTarget === 'external' && !/^https:\/\//i.test(draft.buttonUrl.trim())) {
@@ -143,9 +155,13 @@ export function HomePromoPage() {
     setBusy(true);
     setError(null);
     try {
+      const payload = {
+        ...draft,
+        showButton: hasImage ? draft.showButton : true,
+      };
       const res = await adminFetch<HomePromo>('/api/v1/admin/home-promo', {
         method: 'PATCH',
-        body: JSON.stringify(draft),
+        body: JSON.stringify(payload),
       });
       setDraft(res);
       setSavedAt(new Date().toLocaleTimeString());
@@ -196,7 +212,9 @@ export function HomePromoPage() {
       <Panel title="Content">
         <div className="flex flex-col gap-5">
           <label className="flex flex-col gap-1.5">
-            <span className={fieldLabel}>Title</span>
+            <span className={fieldLabel}>
+              {draft.imageUrl.trim() ? 'Title (optional)' : 'Title'}
+            </span>
             <input
               className={`${field} w-full`}
               value={draft.title}
@@ -204,6 +222,11 @@ export function HomePromoPage() {
               placeholder="What's new"
               onChange={(e) => patch('title', e.target.value)}
             />
+            {draft.imageUrl.trim() ? (
+              <span className="text-xs text-ink-500">With an image, title can be left blank.</span>
+            ) : (
+              <span className="text-xs text-ink-500">Required when On and there is no image.</span>
+            )}
           </label>
           <label className="flex flex-col gap-1.5">
             <span className={fieldLabel}>Subtitle (optional)</span>
@@ -262,20 +285,15 @@ export function HomePromoPage() {
         </div>
       </Panel>
 
-      <Panel title="Button">
+      <Panel title="Button & tap action">
         <div className="flex flex-col gap-5">
-          <label className="flex flex-col gap-1.5">
-            <span className={fieldLabel}>Label (optional — default GOT IT)</span>
-            <input
-              className={`${field} w-full`}
-              value={draft.buttonLabel}
-              maxLength={40}
-              placeholder="GOT IT"
-              onChange={(e) => patch('buttonLabel', e.target.value)}
-            />
-          </label>
           <fieldset>
             <legend className={fieldLabel}>Where it goes</legend>
+            <p className="mt-1 text-xs text-ink-500">
+              {draft.imageUrl.trim() && !draft.showButton
+                ? 'Runs when the user taps the image.'
+                : 'Runs when the user taps the button.'}
+            </p>
             <div className="mt-2 grid gap-2">
               {(
                 [
@@ -339,6 +357,27 @@ export function HomePromoPage() {
               <span className="text-xs text-ink-500">
                 Open Events → an event; the URL ends with <code>/admin/posts/&lt;id&gt;</code>. Use that id.
               </span>
+            </label>
+          ) : null}
+          {draft.imageUrl.trim() ? (
+            <Toggle
+              id="promo-show-button"
+              checked={draft.showButton}
+              onChange={(v) => patch('showButton', v)}
+              label="Show button"
+              hint="Off = hide the button; tapping the image uses “Where it goes” instead."
+            />
+          ) : null}
+          {(!draft.imageUrl.trim() || draft.showButton) ? (
+            <label className="flex flex-col gap-1.5">
+              <span className={fieldLabel}>Button label (optional — default GOT IT)</span>
+              <input
+                className={`${field} w-full`}
+                value={draft.buttonLabel}
+                maxLength={40}
+                placeholder="GOT IT"
+                onChange={(e) => patch('buttonLabel', e.target.value)}
+              />
             </label>
           ) : null}
         </div>
